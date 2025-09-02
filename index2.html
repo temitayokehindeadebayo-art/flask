@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Chatbot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="chat-container">
+    <h2>💬 Customer Support</h2>
+
+    <div class="mode-select">
+      <label><input type="radio" name="mode" value="ai" checked> Talk to AI 🤖</label>
+      <label><input type="radio" name="mode" value="agent"> Talk to Agent 👩‍💼</label>
+    </div>
+
+    <div class="chat-box" id="chat-box">
+      <div class="bot-message">Hello! 👋 Choose AI or Agent to start chatting.</div>
+    </div>
+
+    <form id="chat-form">
+      <input type="text" id="message" name="message" placeholder="Type your message..." required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+<style>
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.chat-container {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  width: 400px;
+  border-radius: 20px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.mode-select {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.mode-select label {
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.chat-box {
+  height: 350px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.user-message {
+  align-self: flex-end;
+  background: #00c6ff;
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 15px 15px 0 15px;
+  margin-top: 10px;
+  max-width: 70%;
+}
+
+.bot-message {
+  align-self: flex-start;
+  background: #ffde59;
+  color: #000;
+  padding: 8px 12px;
+  border-radius: 15px 15px 15px 0;
+  margin-top: 10px;
+  max-width: 70%;
+}
+
+form {
+  display: flex;
+}
+
+form input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 10px 0 0 10px;
+  border: none;
+  outline: none;
+}
+
+form button {
+  padding: 10px 20px;
+  border: none;
+  background: #00c6ff;
+  color: #000;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+form button:hover {
+  background: #0072ff;
+}
+ 
+</style>
+  <script>
+    const form = document.getElementById("chat-form");
+    const chatBox = document.getElementById("chat-box");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const message = document.getElementById("message").value;
+      const mode = document.querySelector("input[name='mode']:checked").value;
+
+      // Display user message
+      chatBox.innerHTML += `<div class="user-message">${message}</div>`;
+
+      const response = await fetch("/chat", {
+        method: "POST",
+        body: new URLSearchParams({ message: message, mode: mode }),
+        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+      });
+
+      const data = await response.json();
+
+      // Display bot/agent response
+      chatBox.innerHTML += `<div class="bot-message">${data.response}</div>`;
+
+      // Scroll down
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Clear input
+      document.getElementById("message").value = "";
+    });
+  </script>
+</body>
+</html>
